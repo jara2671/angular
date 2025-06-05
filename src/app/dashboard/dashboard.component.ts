@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-
-import { Chart, registerables } from 'chart.js'; 
-import { LoginResponseData } from '../models/login-response-data';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Chart } from 'chart.js/auto';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { TokenService } from '../services/token/token.service';
-import { RoleDto } from '../models/RoleDto';
+import { LoginResponseData } from '../models/login-response-data';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,251 +11,166 @@ import { RoleDto } from '../models/RoleDto';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-  currentUser: any;
-  userId: string = '';
+  // Admin metrics
+  totalApplications: number = 0;
+  inProgressCount: number = 0;
+  liveApplicationsCount: number = 0;
+  pendingApprovalCount: number = 0;
 
-  allRequests: number = 0;
-  pendingRequestsCount: number = 0;
-  approvedRequestsCount: number = 0;
-  rejectedRequestsCount: number = 0;
-  issuedRequestsCount: number = 0;
-  closedRequestsCount: number = 0;
+  // Employee metrics
+  myRequestsCount: number = 0;
+  myPendingCount: number = 0;
+  myApprovedCount: number = 0;
+  myRejectedCount: number = 0;
 
-  allMyRequests: number = 0;
-  mypendingRequestsCount: number = 0;
-  myapprovedRequestsCount: number = 0;
-  myrejectedRequestsCount: number = 0;
-  myissuedRequestsCount: number = 0;
-  myclosedRequestsCount: number = 0;
-  allPendingRequestsCount: number = 0;
+  // Table columns
+  displayedColumns: string[] = ['id', 'name', 'requester', 'status', 'actions'];
+  myRequestColumns: string[] = ['id', 'type', 'status', 'created', 'actions'];
 
-  isRequesterOnly: boolean = false;
+  // Data sources
+  recentApplications: any[] = [];
+  myRecentRequests: any[] = [];
+
+  // User role
   isAdmin: boolean = false;
-  isStoreManager: boolean = false;
-  isMainStoreManager: boolean = false;
-  isLineManager: boolean = false;
-  isHoS: boolean = false;
+  currentUser: any;
 
-  constructor( private tokenService: TokenService) {
-    Chart.register(...registerables); 
+  constructor(
+    private dialog: MatDialog,
+    private router: Router,
+    private tokenService: TokenService
+  ) {}
+
+  ngOnInit() {
+    this.getInfo();
+    this.loadDashboardData();
+    this.initializeCharts();
   }
 
-  ngOnInit(): void {
-    this.getinfo();
-    // this.getAllRequests();
-    // this.getAllMyRequests(this.userId);
-    // this.getMyPendingApprovals(this.userId);
+  getInfo() {
+    const loginResponse: LoginResponseData = this.tokenService.getInfo();
+    this.currentUser = this.tokenService.getInfo();
+    const roles = this.currentUser.roles;
+    this.isAdmin = roles.some((role: { roleName: string; }) => 
+      role.roleName.trim().toLowerCase() === 'system admin'.toLowerCase()
+    );
   }
 
-  getinfo(){
-        const loginResponse: LoginResponseData = this.tokenService.getInfo();
-        this.currentUser = this.tokenService.getInfo(); 
-        this.userId = this.currentUser.profile.id;
+  loadDashboardData() {
+    // Simulate loading data - replace with actual API calls
+    if (this.isAdmin) {
+      this.totalApplications = 150;
+      this.inProgressCount = 45;
+      this.liveApplicationsCount = 85;
+      this.pendingApprovalCount = 20;
 
-        var roles: RoleDto[] = this.currentUser.roles;
-        const hasRequesterRole = roles.some(role => role.roleName.trim().toLowerCase() === 'requester'.toLowerCase());
-        const hasAdminRole = roles.some(role => role.roleName.trim().toLowerCase() === 'system admin'.toLowerCase());
-        const hasStoreManagerRole = roles.some(role => role.roleName.trim().toLowerCase() === 'isolator'.toLowerCase());
-        const hasMainStoreManagerRole = roles.some(role => role.roleName.trim().toLowerCase() === 'permit issuer'.toLowerCase());
-        const hasLineManagerRole = roles.some(role => role.roleName.trim().toLowerCase() === 'Line Manager'.toLowerCase());
-        const hasHoSRole = roles.some(role => role.roleName.trim().toLowerCase() === 'HOS'.toLowerCase());
+      this.recentApplications = [
+        { id: 1, name: 'CRM System', requester: 'John Doe', status: 'Pending' },
+        { id: 2, name: 'HR Portal', requester: 'Jane Smith', status: 'In Progress' },
+        // Add more mock data
+      ];
+    } else {
+      this.myRequestsCount = 12;
+      this.myPendingCount = 3;
+      this.myApprovedCount = 8;
+      this.myRejectedCount = 1;
 
+      this.myRecentRequests = [
+        { id: 1, type: 'New Application', status: 'Pending', created: new Date() },
+        { id: 2, type: 'Change Request', status: 'Approved', created: new Date() },
+        // Add more mock data
+      ];
+    }
+  }
 
-        if(hasRequesterRole && roles.length === 1){
-          this.isRequesterOnly = true;
-        }
+  initializeCharts() {
+    if (this.isAdmin) {
+      this.initializeAdminCharts();
+    } else {
+      this.initializeEmployeeCharts();
+    }
+  }
 
-        if(hasAdminRole){
-          this.isAdmin = true;
-        }
-
-        if(hasStoreManagerRole){
-          this.isStoreManager = true;
-        }
-
-        if(hasMainStoreManagerRole){
-          this.isMainStoreManager = true;
-        }
-
-        if(hasLineManagerRole){
-          this.isLineManager = true;
-        }
-
-        if(hasHoSRole){
-          this.isHoS = true;
-        }
-        
+  initializeAdminCharts() {
+    // Application Status Chart
+    new Chart('applicationStatusChart', {
+      type: 'bar',
+      data: {
+        labels: ['In Progress', 'Live', 'Pending Approval'],
+        datasets: [{
+          label: 'Applications by Status',
+          data: [this.inProgressCount, this.liveApplicationsCount, this.pendingApprovalCount],
+          backgroundColor: ['#FF9F40', '#4BC0C0', '#FF6384']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
       }
+    });
 
-  
-
-  createDoughnutChart() {
-    const ctxDoughnut = (document.getElementById('doughnutChart') as HTMLCanvasElement).getContext('2d');
-    if (ctxDoughnut) {
-      new Chart(ctxDoughnut, {
-        type: 'doughnut',
-        data: {
-          labels: ['Approved', 'Pending', 'Rejected'],
-          datasets: [{
-            data: [this.approvedRequestsCount, this.pendingRequestsCount, this.rejectedRequestsCount],
-            backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              callbacks: {
-                label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw}`
-              }
-            }
-          }
-        }
-      });
-    } else {
-      console.error('Failed to get 2D context for doughnut chart');
-    }
+    // Monthly Trends Chart
+    new Chart('monthlyTrendsChart', {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'New Applications',
+          data: [12, 19, 15, 17, 14, 15],
+          borderColor: '#36A2EB',
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
   }
 
-  createBarLineChart() {
-    const ctxBarLine = (document.getElementById('barLineChart') as HTMLCanvasElement).getContext('2d');
-    if (ctxBarLine) {
-      new Chart(ctxBarLine, {
-        type: 'bar',
-        data: {
-          labels: ['All Requests', 'Approved', 'Pending', 'Rejected'],
-          datasets: [
-            {
-              label: 'Count',
-              data: [this.allRequests, this.approvedRequestsCount, this.pendingRequestsCount, this.rejectedRequestsCount],
-              backgroundColor: 'rgba(75, 192, 192, 0.5)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 1,
-              type: 'bar'
-            },
-            {
-              label: 'Trend',
-              data: [this.allRequests, this.approvedRequestsCount, this.pendingRequestsCount, this.rejectedRequestsCount],
-              type: 'line',
-              borderColor: 'rgba(255, 99,  132, 1)',
-              fill: false,
-              tension: 0.1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              callbacks: {
-                label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}`
-              }
-            }
-          }
-        }
-      });
-    } else {
-      console.error('Failed to get 2D context for bar/line chart');
-    }
+  initializeEmployeeCharts() {
+    new Chart('myRequestsChart', {
+      type: 'doughnut',
+      data: {
+        labels: ['Pending', 'Approved', 'Rejected'],
+        datasets: [{
+          data: [this.myPendingCount, this.myApprovedCount, this.myRejectedCount],
+          backgroundColor: ['#FF9F40', '#4BC0C0', '#FF6384']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
   }
 
-
-  createMyDoughnutChart() {
-    const ctxDoughnut = (document.getElementById('myDoughnutChart') as HTMLCanvasElement).getContext('2d');
-    if (ctxDoughnut) {
-      new Chart(ctxDoughnut, {
-        type: 'doughnut',
-        data: {
-          labels: ['Approved', 'Pending', 'Rejected'],
-          datasets: [{
-            data: [this.myapprovedRequestsCount, this.mypendingRequestsCount, this.myrejectedRequestsCount],
-            backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              callbacks: {
-                label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw}`
-              }
-            }
-          }
-        }
-      });
-    } else {
-      console.error('Failed to get 2D context for doughnut chart');
-    }
+  // Action handlers
+  createNewRequest() {
+    this.router.navigate(['/home/create-application-request']);
   }
 
-  createMyBarLineChart() {
-    const ctxBarLine = (document.getElementById('myBarLineChart') as HTMLCanvasElement).getContext('2d');
-    if (ctxBarLine) {
-      new Chart(ctxBarLine, {
-        type: 'bar',
-        data: {
-          labels: ['All Requests', 'Approved', 'Pending', 'Rejected'],
-          datasets: [
-            {
-              label: 'Count',
-              data: [this.allMyRequests, this.myapprovedRequestsCount, this.mypendingRequestsCount, this.myrejectedRequestsCount],
-              backgroundColor: 'rgba(75, 192, 192, 0.5)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 1,
-              type: 'bar'
-            },
-            {
-              label: 'Trend',
-              data: [this.allMyRequests, this.myapprovedRequestsCount, this.mypendingRequestsCount, this.myrejectedRequestsCount],
-              type: 'line',
-              borderColor: 'rgba(255, 99,  132, 1)',
-              fill: false,
-              tension: 0.1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              callbacks: {
-                label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}`
-              }
-            }
-          }
-        }
-      });
-    } else {
-      console.error('Failed to get 2D context for bar/line chart');
-    }
+  createChangeRequest() {
+    // Implement change request navigation
   }
 
+  viewDetails(app: any) {
+    // Implement view details dialog
+  }
+
+  assignOwner(app: any) {
+    // Implement assign owner dialog
+  }
+
+  setDeadline(app: any) {
+    // Implement deadline setting dialog
+  }
+
+  viewRequestDetails(req: any) {
+    // Implement request details dialog
+  }
+
+  addComment(req: any) {
+    // Implement comment dialog
+  }
 }
