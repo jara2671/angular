@@ -1,0 +1,143 @@
+
+<div class="header">
+    <img src="assets/holcim-logo.png" alt="Holcim Logo" />
+    <div class="title">Energy Isolation Permit</div>
+    <div class="spacer"></div>
+  </div>
+  
+  <div class="table-container">
+    <table>
+        <tr>
+        <th>Energy Isolation Procedure Ref #</th>
+        <td>{{ permit.procedureReferenceNumber }}</td>
+        <th>Date created</th>
+        <td>{{ permit.createdDate | date: 'MMMM dd, yyy.'}}</td>
+        </tr>
+        <tr>
+        <th>Valid from (date / time)</th>
+        <td>{{ permit.validFrom| date: 'MMMM dd, yyy.'}}</td>
+        <th>Valid until (date / time)</th>
+        <td>{{ permit.validTo| date: 'MMMM dd, yyy.'}}</td>
+        </tr>
+        <tr>
+        <th>Description of task to be performed</th>
+        <td colspan="3">{{ permit.descriptionOfTask }}</td>
+        </tr>
+        <tr>
+        <th>Specific details of instructions for the permit</th>
+        <td colspan="3">{{ permit.permitInstructions }}</td>
+        </tr>
+    </table>
+  </div>
+
+  <div class="table-container">
+    <table>
+        <tr class="section-header">
+          <th colspan="3">Workers involved in the task</th>
+        </tr>
+        <tr>
+          <th>#</th>
+          <th>Worker’s Name</th>
+          <th>Company</th>
+        </tr>
+        <tr *ngFor="let w of workers; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ w.name }}</td>
+          <td>{{ w.company }}</td>
+        </tr>
+        </table> 
+  </div>
+  
+  <div class="table-container">
+    <table>
+        <tr class="section-header">
+          <th colspan="3">Verifications before issuing the permit</th>
+        </tr>
+        <tr>
+          <th>Question</th>
+          <th>Yes/No</th>
+        </tr>
+        <tr *ngFor="let v of issueVerifications">
+          <td>{{ v.question }}</td>
+          <td>{{ v.answer }}</td>
+        </tr>
+      </table>
+  </div>
+  
+
+  <div class="table-container">
+    <table>
+        <tr class="section-header">
+          <th colspan="4">Approvals</th>
+        </tr>
+        <tr>
+          <th>Role</th><th>Name</th><th>Email</th><th>Comment</th>
+        </tr>
+        <tr>
+          <td>Permit Issuer</td>
+          <td>{{ getFullNameFromEmail(permit.permitIssuerToApprove) }}</td>
+          <td>{{ permit.permitIssuerToApprove }}</td>
+          <td>{{ permit.permitIssuerComment }}</td>
+        </tr>
+        <tr *ngIf="permit.isolatorToApprove">
+          <td>Isolator (if different)</td>
+          <td>{{ getFullNameFromEmail(permit.isolatorToApprove) }}</td>
+          <td>{{ permit.isolatorToApprove }}</td>
+          <td>{{ permit.isolatorComment }}</td>
+        </tr>
+        <tr>
+          <td>Work Supervisor</td>
+          <td>{{ getFullNameFromEmail(permit.requesterEmail) }}</td>
+          <td>{{ permit.requesterEmail }}</td>
+          <td>N/A</td>
+        </tr>
+      </table>
+  </div>
+  
+
+  <div class="table-container">
+    <table>
+        <tr class="section-header">
+          <th colspan="3">Verifications before re-energization</th>
+        </tr>
+        <tr>
+          <th>Question</th><th>Yes/No</th>
+        </tr>
+        <tr *ngFor="let v of reenergizeVerifications">
+          <td>{{ v.question }}</td>
+          <td>{{ v.answer }}</td>
+        </tr>
+      </table>
+  </div>
+  
+
+  <div class="table-container">
+    <table>
+        <tr class="section-header">
+          <th colspan="5">Work closure</th>
+        </tr>
+        <tr>
+          <th>Role</th><th>Name & Company</th><th>Comment</th><th>Date</th>
+        </tr>
+        <tr>
+          <td>Permit Issuer</td>
+          <td>{{ getFullNameFromEmail(permit.permitIssuerToApprove) }}</td>
+          <td>{{ permit.issuerClosureComment }}</td>
+          <td>{{permit.permitIssuerApprovalDate | date: 'MMMM dd, yyy.'}}</td>
+        </tr>
+        <tr>
+          <td>Work Supervisor</td>
+          <td>{{ getFullNameFromEmail(permit.requesterEmail) }}</td>
+          <td>{{ permit.requesterEmail }}</td>
+          <td>{{ permit.permitIssuerApprovalDate | date: 'MMMM dd, yyy.'}}</td>
+        </tr>
+      </table> 
+  </div>
+  
+  
+  <p class="small">
+    Contact your supervisor if you have any questions or concerns about the accuracy or effectiveness of this procedure.<br>
+    Failure to follow safe instructions may result in disciplinary action up to and including termination.<br>
+    <strong>DOCUMENT IS CONTROLLED WHEN PRINTED</strong>
+  </p>
+  

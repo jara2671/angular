@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>📄 Permit Details</h2>
+
+<mat-dialog-content class="permit-details">
+  <div class="field">
+    <span class="label">Permit Number:</span>
+    <span class="value">{{ data.permitNumber }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Requester Email:</span>
+    <span class="value">{{ data.requesterEmail }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Procedure Ref No:</span>
+    <span class="value">{{ data.procedureReferenceNumber }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Description:</span>
+    <span class="value">{{ data.descriptionOfTask }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Instructions:</span>
+    <span class="value">{{ data.permitInstructions }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Valid From:</span>
+    <span class="value">{{ data.validFrom | date: 'short' }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Valid To:</span>
+    <span class="value">{{ data.validTo | date: 'short' }}</span>
+  </div>
+  <div class="field">
+    <span class="label">Status:</span>
+    <span class="value">{{ data.status }}</span>
+  </div>
+
+  <div class="field">
+    <span class="label">Workers:</span>
+    <ul class="value" *ngIf="data.workers?.length > 0; else noWorkers">
+      <li *ngFor="let worker of data.workers">
+        {{ worker.name }} - {{ worker.company }}
+      </li>
+    </ul>
+    <ng-template #noWorkers>
+      <i>No workers assigned</i>
+    </ng-template>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="actions">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

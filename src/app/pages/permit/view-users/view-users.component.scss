@@ -1,0 +1,81 @@
+.view-users-card {
+    .main-content {
+      display: flex;
+      flex-direction: row;
+      position: relative;
+    }
+  
+    .mat-icon-button {
+        padding: 4px;
+        height: 40px;
+        width: 40px;
+      }
+      
+    .table-section {
+      flex: 1;
+      padding-right: 20px;
+    }
+  
+    .sidebar {
+      width: 350px;
+      background-color: #fafafa;
+      border-left: 1px solid #e0e0e0;
+      padding: 20px;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      overflow-y: auto;
+    }
+  
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    .user-details {
+      margin-bottom: 20px;
+  
+      p {
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+    }
+  
+    .roles-title {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  
+    .roles-list {
+      list-style: none;
+      padding: 0;
+  
+      li {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+  
+    .sidebar-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+  
+    .close-btn {
+      font-size: 20px;
+      cursor: pointer;
+    }
+  
+    .loading-text {
+      text-align: center;
+      margin-top: 20px;
+      font-style: italic;
+    }
+  }
+  

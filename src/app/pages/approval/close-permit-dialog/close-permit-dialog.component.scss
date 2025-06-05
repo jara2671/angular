@@ -1,0 +1,29 @@
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  
+    p {
+      margin: 0;
+      font-weight: 500;
+    }
+  
+    .comment-box {
+      width: 100%;
+    }
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  
+    button {
+      min-width: 100px;
+    }
+  }
+  
+  .title {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }

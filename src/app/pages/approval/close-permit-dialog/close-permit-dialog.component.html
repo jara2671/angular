@@ -1,0 +1,17 @@
+<h2 mat-dialog-title class="title">
+    Close Permit
+</h2>
+  
+  <mat-dialog-content class="dialog-content">
+    <p>Please provide a comment before you close this permit:</p>
+    <mat-form-field appearance="fill" class="comment-box">
+      <mat-label>Comment</mat-label>
+      <textarea matInput [(ngModel)]="comment" rows="4" placeholder="Enter your comment..."></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="close()">Cancel</button>
+    <button mat-raised-button (click)="approvePermit()"> Submit </button>
+  </mat-dialog-actions>
+  

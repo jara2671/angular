@@ -1,0 +1,52 @@
+/* add more space above everything */
+:host {
+  display: block;
+  margin-top: 2rem;       /* more space at the top */
+  padding: 2rem 3rem;        /* horizontal padding around the tables */
+}
+
+/* wrapper that makes tables scrollable on narrow screens */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;  /* space between tables */
+}
+
+/* ensure tables take full available width */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;       /* ensure a reasonable full-width on desktop; scrolls on mobile */
+}
+
+/* top-most permit-details table */
+.top-details th:first-child,
+.top-details td:first-child {
+  width: 40%;             /* first column = 40% of the table */
+}
+.top-details th:nth-child(2),
+.top-details td:nth-child(2) {
+  width: 60%;             /* the rest of the row will share the remaining 60% */
+}
+
+/* general styling (you may already have these) */
+th, td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+th {
+  background-color: #00707b;
+  color: white;
+  text-align: left;
+}
+
+/* mobile tweaks */
+@media (max-width: 600px) {
+  th, td {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  .title {
+    font-size: 1.25rem;
+  }
+}

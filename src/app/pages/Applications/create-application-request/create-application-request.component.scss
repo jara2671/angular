@@ -1,0 +1,64 @@
+.access-request-form {
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #34495e;
+      font-weight: 500;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      transition: border-color 0.3s;
+
+      &:focus {
+        border-color: #0077ff;
+        outline: none;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+    }
+  }
+
+  .form-actions {
+    text-align: center;
+
+    button {
+      padding: 0.75rem 2rem;
+      background: #0077ff;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+
+      &:hover {
+        background: #005ec2;
+      }
+    }
+  }
+}

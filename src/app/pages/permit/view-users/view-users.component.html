@@ -1,0 +1,106 @@
+<mat-card class="view-users-card w-100">
+    <mat-card-content class="main-content">
+      
+      <!-- Left: Table Section -->
+      <div class="table-section">
+        <h2 class="section-title">👥 View Users</h2>
+  
+        <div class="table-search">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search users</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Search" #input>
+          </mat-form-field>
+        </div>
+  
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2 w-100">
+  
+            <!-- Position -->
+            <ng-container matColumnDef="position">
+              <th mat-header-cell *matHeaderCellDef fxHide.lt-md> # </th>
+              <td mat-cell *matCellDef="let user; let i = index" fxHide.lt-md> {{ i + 1 }} </td>
+            </ng-container>
+  
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let user">
+                <p class="mb-0 fw-medium">{{ user.lastName }} {{ user.firstName }}</p>
+              </td>
+            </ng-container>
+  
+            <!-- Email -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef fxHide.lt-md> Email </th>
+              <td mat-cell *matCellDef="let user" fxHide.lt-md>
+                <p class="mb-0 fw-medium">{{ user.email }}</p>
+              </td>
+            </ng-container>
+  
+            <!-- Function -->
+            <ng-container matColumnDef="positions">
+              <th mat-header-cell *matHeaderCellDef> Function </th>
+              <td mat-cell *matCellDef="let user">
+                <p class="mb-0 fw-medium">{{ user.functionName }}</p>
+              </td>
+            </ng-container>
+  
+            <!-- Action -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef> Action </th>
+              <td mat-cell *matCellDef="let user">
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="openSidebar(user)">
+                      <mat-icon>visibility</mat-icon>
+                      <span>View</span>
+                    </button>
+                  </mat-menu>
+                  
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                                </td>
+            </ng-container>
+  
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  
+          </table>
+  
+          <mat-paginator #paginator [pageSizeOptions]="[10, 15, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+      </div>
+  
+      <!-- Right: Sidebar Section -->
+      <div class="sidebar" *ngIf="sidebarOpen">
+        <div class="sidebar-header">
+          <h2>User Details</h2>
+          <button mat-icon-button class="close-btn" (click)="closeSidebar()">✕</button>
+        </div>
+  
+        <div class="user-details">
+          <p><strong>First Name:</strong> {{ selectedUser?.firstName }}</p>
+          <p><strong>Last Name:</strong> {{ selectedUser?.lastName }}</p>
+          <p><strong>Email:</strong> {{ selectedUser?.email }}</p>
+          <p><strong>Function:</strong> {{ selectedUser?.functionName }}</p>
+        </div>
+  
+        <h3 class="roles-title">Roles</h3>
+  
+        <div *ngIf="isRolesLoading" class="loading-text">Loading roles...</div>
+  
+        <ul *ngIf="!isRolesLoading" class="roles-list">
+          <li *ngFor="let role of userRoles">
+            {{ role.roleName }}
+            <button mat-button color="warn" (click)="removeRole(role.id)">Remove</button>
+          </li>
+        </ul>
+  
+        <div class="sidebar-buttons">
+          <button mat-raised-button color="primary" (click)="openAddRolesDialog()">Add Role</button>
+        </div>
+      </div>
+  
+    </mat-card-content>
+  </mat-card>
+  

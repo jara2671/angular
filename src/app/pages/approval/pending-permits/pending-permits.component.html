@@ -1,0 +1,165 @@
+
+<mat-card class="w-100">
+  <mat-card-content>
+    <h2 class="mb-56">🚧 Permits Pending Approval</h2>
+
+    <div class="table-responsive">
+          
+      <mat-form-field>
+          <mat-label>Search permits</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Search" #input>
+      </mat-form-field>   
+      <table  mat-table [dataSource]="dataSource" matSort class="text-nowrap w-100">
+
+           <!-- S/N Column -->
+          <ng-container matColumnDef="position">
+              <th mat-header-cell *matHeaderCellDef fxHide.lt-sm fxHide.lt-md fxHide.md>S/N </th>
+              <td mat-cell class="fw-medium" *matCellDef="let i = index" fxHide.lt-sm fxHide.lt-md fxHide.md> 
+              {{ (paginator.pageIndex * paginator.pageSize) + (i + 1) }}
+              </td>
+          </ng-container>
+
+          <!-- Reference Column -->
+        <ng-container matColumnDef="permitNumber">
+          <th mat-header-cell *matHeaderCellDef fxHide.lt-sm fxHide.lt-md fxHide.md> Permit Number </th>
+          <td mat-cell *matCellDef="let permit" fxHide.lt-sm fxHide.lt-md fxHide.md>
+              <p class="mb-0 fw-medium">{{permit.permitNumber}}</p>
+          </td>
+        </ng-container>
+      
+          <!-- Item name Column -->
+          <ng-container matColumnDef="requesterEmail">
+              <th mat-header-cell *matHeaderCellDef fxHide.lt-sm fxHide.lt-md fxHide.md> Requester Email </th>
+              <td mat-cell *matCellDef="let permit" fxHide.lt-sm fxHide.lt-md fxHide.md>
+                  <p class="mb-0 fw-medium">{{permit.requesterEmail}}</p>
+              </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="referenceNumber">
+              <th mat-header-cell *matHeaderCellDef> Reference Number </th>
+              <td mat-cell *matCellDef="let permit">
+                  <p class="mb-0 fw-medium">{{permit.procedureReferenceNumber}}</p>
+              </td>
+          </ng-container>
+          
+          <!-- Quantity Column -->
+          <ng-container matColumnDef="validFrom">
+              <th mat-header-cell *matHeaderCellDef fxHide.lt-sm fxHide.lt-md fxHide.md> Valid From </th>
+              <td mat-cell *matCellDef="let permit" fxHide.lt-sm fxHide.lt-md fxHide.md>
+                  <p class="mb-0 fw-medium">{{ permit.validFrom | date: 'MMMM dd, yyy.'}}</p>
+              </td>
+          </ng-container>
+
+          <!-- Approved Quantity Column -->
+          <ng-container matColumnDef="validTo">
+            <th mat-header-cell *matHeaderCellDef fxHide.lt-sm fxHide.lt-md fxHide.md>Valid To</th>
+            <td mat-cell *matCellDef="let permit" fxHide.lt-sm fxHide.lt-md fxHide.md>
+              <p class="mb-0 fw-medium">{{ permit.validTo | date: 'MMMM dd, yyy.' }}</p>
+            </td>
+          </ng-container>
+
+          <!-- Movement date Column -->  
+          <ng-container matColumnDef="Status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let permit">
+              <p class="mb-0 fw-medium">{{permit.status}}</p>
+              </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let permit">
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu" >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item color="secondary" (click)="openPopUp(permit)">
+                  <mat-icon>visibility</mat-icon>
+                    <span>View</span>
+                  </button>
+
+                  <button mat-menu-item color="secondary" (click)="openApprovalDialog(permit)">
+                  <mat-icon>check_circle</mat-icon>
+                      <span>Approve</span>
+                  </button>
+
+                  <button mat-menu-item color="secondary" (click)="openRejectionDialog(permit)">
+                    <mat-icon>cancel</mat-icon>
+                      <span>Reject</span>
+                  </button>
+
+                </mat-menu>
+              </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <!-- mat-paginator -->
+      <mat-paginator #paginator [pageSizeOptions]="[10, 15, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+
+  <!-- Pop-Up -->
+  <div *ngIf="isInfoPopUpVisible">
+
+    <div class="overlay" (click)="close()" aria-hidden="true"></div>
+    <div id="popup" role="dialog" aria-modal="true" aria-labelledby="popup-header" tabindex="0">
+      <div id="popup-header">
+        Permit Request: {{selectedPermitRequest?.permitNumber}} ({{selectedPermitRequest?.taskCompletionStatus}})
+        <button id="close-btn" aria-label="Close popup" (click)="close()">&times;</button>
+      </div>
+
+      <div id="popup-content">
+
+        <div fxLayout="row wrap" fxLayoutGap="5px grid">
+            <div fxFlex.md="33%" fxFlex.lg="33%" fxFlex.xl="33%" fxFlex.sm="50%" fxFill>
+              <mat-label><h5>Reference</h5></mat-label>
+              <p class="entry">{{selectedPermitRequest?.procedureReferenceNumber}}</p>
+            </div>
+            <div fxFlex.md="33%" fxFlex.lg="33%" fxFlex.xl="33%" fxFlex.sm="50%" fxFill>
+              <mat-label><h5>Valid From</h5></mat-label>
+              <p class="entry">{{selectedPermitRequest?.validFrom | date: 'MMMM dd, yyy.'}}</p>
+            </div>
+            <div fxFlex.md="33%" fxFlex.lg="33%" fxFlex.xl="33%" fxFlex.sm="50%" fxFill>
+              <mat-label><h5>Valid To</h5></mat-label>
+              <p class="entry">{{selectedPermitRequest?.validTo | date: 'MMMM dd, yyy.'}}</p>
+            </div>
+        </div>
+
+      <div id="lower-info" aria-label="Lower information column">
+          <div class="info-box">
+            <h5>Pending With</h5>
+            <div>{{selectedPermitRequest?.pendingWith}} ({{selectedPermitRequest?.pendingWithPosition}})</div>          
+          </div>
+          <div class="info-box">
+            <h5>Requester Email</h5>
+            <div>{{selectedPermitRequest?.requesterEmail}}</div>          
+          </div>
+          <div class="info-box" *ngIf="selectedPermitRequest?.isolatorToApprove">
+            <h5>Isolator To Approve</h5>
+            <div>{{selectedPermitRequest?.isolatorToApprove}}</div>           
+          </div>
+          <div class="info-box" *ngIf="selectedPermitRequest?.isolatorToApprove">
+            <h5>Permit Issuer To Approve</h5>
+            <div>{{selectedPermitRequest?.permitIssuerToApprove}}</div>           
+          </div>
+          <div class="info-box">
+            <h5> Description Of Task</h5>
+            <div>{{selectedPermitRequest?.descriptionOfTask}}</div>          
+          </div>
+          <div class="info-box">
+            <h5> Permit Instructions</h5>
+            <div>{{selectedPermitRequest?.permitInstructions}}</div>           
+          </div>
+      </div>
+      
+      </div>
+    </div>
+  </div>
+  
+</mat-card-content>
+
+  
+
+</mat-card>
